@@ -1,0 +1,214 @@
+from pytube import YouTube
+from pytube.exceptions import VideoUnavailable, RegexMatchError
+import wget
+import os
+
+import tkinter as tk
+from PIL import Image, ImageTk
+
+################# Gestion fichier #################
+path = "download_youtube"
+
+if not os.path.exists(path) :
+    os.mkdir(path)  
+
+################# Fonction pour afficher une nouvelle fenêtre ################
+def afficher_nouvelle_fenetre():
+    #Création du lien entre un objet et le lien youtube
+    url = main_entree.get()
+    # si le lien est valide
+    try:
+        contenu = main_entree.get()  # Récupère le contenu de l'Entry widget
+        main_label.config(text=contenu + " doesn't exist")
+        yt = YouTube(url) # créer l'objet youtube
+        print(yt)
+    # Si le lien est non valide
+    except VideoUnavailable:
+        main_label.config(text=f'[UNAVAIBLE ERROR] Video \"{url}\" is unavaialable') # cas ou le lien indisponible
+    except RegexMatchError:
+        main_label.config(text=f'[ANY MATCHES] Video \"{url}\" doesn\'t exist') # cas ou le lien n'existe pas
+    else :               
+        # affiche si le lien existe sur la page principale
+
+        main_label.config(text= f"\"{url}\" exist")
+        
+        # Créé la nouvelle fenêtre fille
+        sub_window = tk.Toplevel(main_window)  # Crée une nouvelle fenêtre
+        sub_window.title("Youtube downloader")
+        sub_window.geometry("670x900")
+        sub_window.configure(bg="#333333", padx=10, pady=10)
+        sub_window.iconbitmap("iconbitmap.ico")
+        
+        # INFORMATIONS VIDEO
+        titre = yt.title
+        # nom de la chaine
+        channel_name = yt.author
+        # nom du fichier sauvegardé
+        path_movie = channel_name + " - " + titre
+        # Téléchargement de l'image
+        file_name = wget.download(yt.thumbnail_url, out="download_youtube\\") # télécharge la vignette       
+        # Fichier MP4 avec son et audio séparés
+        nb_param_video = len(yt.streams.filter(subtype="mp4", adaptive=True).order_by("resolution"))
+        param_video = yt.streams.filter(subtype="mp4", adaptive=True).order_by("resolution")
+        # Fichier Audio MP3
+        nb_param_audio = len(yt.streams.filter(only_audio=True).order_by("abr"))
+        param_audio = yt.streams.filter(only_audio=True).order_by("abr")
+            
+        # définit le nombre de ligne de la grille
+        if nb_param_video >= nb_param_audio :
+            N = nb_param_video
+        else :
+            N = nb_param_audio
+            
+        # paramètre grille pour centrer les objets
+        sub_window.grid_columnconfigure(0, weight=1)
+        for row in [0, 1, 2, N+3, N+4] :
+            sub_window.grid_rowconfigure(row, weight=1) 
+        
+        # Charge une image
+        sub_image = Image.open(file_name).resize((500, 250), Image.Resampling.LANCZOS)
+        sub_photo = ImageTk.PhotoImage(sub_image)
+        # Crée un label pour afficher l'image de la vidéo
+        sub_label_image = tk.Label(sub_window, image=sub_photo)
+        sub_label_image.photo = sub_photo
+        sub_label_image.grid(row=0, column=0, columnspan=2)  # Affiche l'image sur deux colonnes
+        # Gestion de fichier #
+        if os.path.isfile(file_name):
+            os.remove(file_name)
+        else:
+            main_label.config(text= 'Path is not a file')
+        # label qui affiche le titre de la vidéo
+        sub_label_name = tk.Label(sub_window, relief=tk.SOLID, text=path_movie, font=("Helvetica", 10), bg="#f05a2D", width=80, height=3)
+        sub_label_name.grid(row=1, column=0, columnspan=2)  
+        
+        # variable contenant toutes les résolutions disponibles
+        resolution = []
+        dico_resolution_itag = {}
+        for nb in range(nb_param_video):
+            resolution.append(param_video[nb].resolution)
+            dico_resolution_itag[param_video[nb].resolution] = param_video[nb].itag
+        list_resolution = []
+        for key in dico_resolution_itag.keys() :
+            list_resolution.append(str(key))
+        # variable contenant toutes les résolutions disponibles    
+        abr = []
+        dico_abr_itag = {}
+        for nb in range(nb_param_audio):
+            abr.append(param_audio[nb].abr)
+            dico_abr_itag[param_audio[nb].abr] = param_audio[nb].itag
+        list_abr = []
+        for key in dico_abr_itag.keys() :
+            list_abr.append(str(key))
+            
+        # Créé la grille de checkbox avec label
+        # label vidéo
+        sub_label_video = tk.Label(sub_window, relief=tk.RIDGE, text="VIDEO", font=("Helvetica", 10), bg="#595959", fg= "white", width=35, height=1)
+        sub_label_video.grid(row=2, column=0) 
+        # label audio
+        sub_label_audio = tk.Label(sub_window, relief=tk.RIDGE, text="AUDIO", font=("Helvetica", 10), bg="#595959", fg= "white", width=35, height=1)
+        sub_label_audio.grid(row=2, column=1) 
+        # fonction quand tu appuyes sur les boutons
+        global option_select
+        option_select = 0
+        def button_click(nb):
+            global option_select
+            global audio_or_video
+            global quality
+            option_select = 1
+            if nb < nb_param_video :
+                audio_or_video = "v"
+                quality = list_resolution[nb]
+                sub_label_param.config(text= list_resolution[nb])
+            else :
+                audio_or_video = "a"
+                quality = list_abr[nb-nb_param_video]
+                sub_label_param.config(text= list_abr[nb-nb_param_video])
+        # Affiche les boutons
+        for row in range(3, nb_param_video+3):
+            # Crée un checkbox
+            bouton = tk.Checkbutton(sub_window, text=list_resolution[row-3], command=lambda row=row: button_click(row - 3), relief=tk.RIDGE, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 10, "bold"), width=35, height=2)
+            bouton.grid(row=row, column=0)
+        for row in range(3, nb_param_audio+3):
+            # Crée un checkbox
+            bouton = tk.Checkbutton(sub_window, text=list_abr[row-3], command=lambda row=row: button_click(row + nb_param_video - 3), relief=tk.RIDGE, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 10, "bold"), width=35, height=2)
+            bouton.grid(row=row, column=1)
+        
+        # label qui affiche l'option
+        sub_label_param = tk.Label(sub_window, relief=tk.SOLID, text="Selectionner un paramètre", font=("Helvetica", 10), bg="#f05a2D", width=80, height=3)
+        sub_label_param.grid(row=N+3, column=0, columnspan=2)   
+        # Bouton pour télécharger la vidéo
+        def telecharger_video():
+            # si une option a été sélectionnée
+            if option_select == 1 :
+                # retrouve itag lié à la qualité
+                if audio_or_video == "a" :
+                    itag = dico_abr_itag[quality]
+                elif audio_or_video == "v" :
+                    itag = dico_resolution_itag[quality]
+                stream = yt.streams.get_by_itag(itag)
+                # télécharge la vidéo
+                if audio_or_video == "v" :
+                    sub_label_param.config(text="EN COURS ...")
+                    if not os.path.exists(path) :
+                        stream.download(output_path= path)
+                else :
+                    sub_label_param.config(text="EN COURS ...")
+                    out_file = stream.download(output_path= path)
+                    # sauvegarde au format mp3
+                    
+                    base, ext = os.path.splitext(out_file)
+                    new_file = base + '.mp3'
+                    if not os.path.exists(new_file) :
+                        os.rename(out_file, new_file)
+                    else :
+                        os.remove(new_file)
+                # affiche la fin du téléchargement avec la taille du fichier
+                if stream.filesize/1024 < 1000 :
+                    sub_label_param.config(text= f"Download Finish - {stream.filesize/(1024):.2f} Ko")
+                elif stream.filesize/(1024*1024) < 1000 :
+                    sub_label_param.config(text= f"Download Finish - {stream.filesize/(1024*1024):.2f} Mo")
+                else :
+                    sub_label_param.config(text= f"Download Finish - {stream.filesize/(1024*1024):.2f} Go")
+                #option_select = 0
+            else :
+                sub_label_param.config(text="NO OPTION SELECT")
+                
+        sub_bouton_telecharger = tk.Button(sub_window, text="Télécharger la vidéo", command=telecharger_video, width=70, height=3)
+        sub_bouton_telecharger.grid(row=N+4, column=0, columnspan=2) # Affiche le bouton sur deux colonnes
+        sub_bouton_telecharger.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))         
+        
+
+################ Crée la fenêtre principale ################
+main_window = tk.Tk()
+main_window.title("Youtube downloader")
+main_window.geometry("700x400")
+main_window.configure(bg="#333333", padx=10, pady=10)
+main_window.iconbitmap("iconbitmap.ico")
+
+################# Image logo ################
+# ouvre et redimentionne l'image
+image = Image.open("logo.png").resize((100, 100), Image.Resampling.LANCZOS)
+photo = ImageTk.PhotoImage(image)
+# Crée un label pour afficher l'image
+label = tk.Label(main_window, image=photo)
+label.pack(pady=30)
+
+################# Ligne pour entrer du texte ################
+main_entree = tk.Entry(main_window, width=200, relief=tk.RIDGE)
+main_entree.pack(pady=10)
+
+################# Bouton pour afficher une nouvelle fenêtre ################
+main_button = tk.Button(main_window, text="Générer les options de la vidéo", command=afficher_nouvelle_fenetre, bg="blue", fg="white", font=("Helvetica", 12))
+# Personnalise l'apparence du bouton
+main_button.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))  # Ajoute un effet de relief au bouton
+main_button.pack(pady=30)
+
+################# Label de vérification ################
+main_label = tk.Label(main_window, relief=tk.SOLID, text="Vérifiation du lien", font=("Helvetica", 10), bg="#f05a2D", width=200, height=3)
+main_label.pack()
+
+# Nombre de lignes dans la grille (modifiez cette valeur selon vos besoins)
+labels = []  # Pour stocker les labels afin de les mettre à jour
+        
+################# Lancement de la boucle principale de l'interface graphique ################
+main_window.mainloop()
