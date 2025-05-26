@@ -4,7 +4,13 @@ Downyt est un outil qui permet de télécharger des vidéos youtube sous deux fo
 1 - Page pour entrer le lien
 2- Page qui permet de choisir les différents paramètres du fichier à télécharger
 
+## Compatibilité
+
+Downyt est valide sur :
+- Windows
+
 ## Prérequis 
+
 1. Avoir python installer et pouvoir le lancer avec la commande shell "python"
 2. Avoir pip installé
 
