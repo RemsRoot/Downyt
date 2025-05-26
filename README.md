@@ -26,7 +26,9 @@ Downyt est un outil qui permet de télécharger des vidéos youtube sous deux fo
 
 # Lancement de l'app
 
-lancer la commande :
+1. Double clic sur le fichier shell_youtube_downloader.bat
+
+2. lancer l'invite de commande commande :
 ./shell_youtube_downloader.bat
 
 # VERSION
