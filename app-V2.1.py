@@ -50,7 +50,7 @@ def gestion_download_youtube() :
       
 ####################### Fonction de gestion des nom d'artiste et de titres
 def name_artiste_titre(artiste, titre) :
-    chaine_interdit_titre = [" (clip officiel)", artiste, " - ", "\\"]
+    chaine_interdit_titre = [" (clip officiel)", " (Clip Officiel)", artiste, "*", " - ", "\\"]
     chaine_interdit_artiste = [" - Topic", "\\", "/"]
     for chaine in chaine_interdit_titre :
         titre = titre.replace(chaine, "")
