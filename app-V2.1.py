@@ -60,7 +60,7 @@ def name_artiste_titre(artiste, titre) :
     for chaine in chaine_interdit_artiste :
         artiste = artiste.replace(chaine, "")
     # Suppression des caractères et chaine problématique ou récurante sur le titre
-    chaine_interdit_titre = [" (clip officiel)", " (Clip Officiel)"," (Clip officiel)", str(artiste).upper(), str(artiste).lower(), "*", " - ", "\\"]
+    chaine_interdit_titre = [" (clip officiel)", " (Clip Officiel)"," (Clip officiel)", " [clip officiel]", " [Clip Officiel]"," [Clip officiel]", str(artiste).upper(), str(artiste).lower(), "*", " - ", "\\"]
     for chaine in chaine_interdit_titre :
         titre = titre.replace(chaine, "")
     return artiste, titre
