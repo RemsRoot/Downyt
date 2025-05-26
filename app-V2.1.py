@@ -211,7 +211,8 @@ def afficher_nouvelle_fenetre():
                     # sauvegarde au format mp3
                     
                     base, ext = os.path.splitext(out_file)
-                    new_file = base + '.mp3'
+                    # ajout de "-file" au nom du fichier pour eviter un futur problème avec ffmeg qui réécrit sur le fichier en cas de nom identique 
+                    new_file = base + '-file.mp3'
                     if not os.path.exists(new_file) :
                         os.rename(out_file, new_file)
                     else :
@@ -227,7 +228,10 @@ def afficher_nouvelle_fenetre():
                 # Si c'est une musique, il faut changer les métadonnées
                 if audio_or_video != "v" :
                     file_name_final = path + "\\" + auteur + " - " + titre.replace("/", "") + ".mp3"
+                    print(new_file, "\n", file_name_final)
                     modifier_metadonnees(new_file, file_name_final, titre, auteur, album)
+                    if os.path.exists(new_file) :
+                        os.remove(new_file)
             else :
                 sub_label_param.config(text="NO OPTION SELECT")
             if audio_or_video == "v" :

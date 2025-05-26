@@ -5,7 +5,7 @@ from mutagen.mp3 import MP3
 # réalise la commande à appliquer avant : ffmpeg -i fichier_original.mp3 fichier_converti.mp3
 def command_ffmeg(fichier_original, fichier_converti):
     music_file = ffmpeg.input(fichier_original)
-    music_file.output(fichier_converti, loglevel="quiet").run()
+    music_file.output(fichier_converti, loglevel="quiet", y=None).run() # le rend silencieux et accepte automatiquement la réécriture
     
 # Charger les métadonnées du fichier MP3
 def modifier_metadonnees(fichier_entree, fichier_sortie, titre, artiste, album) : 
@@ -27,7 +27,7 @@ def modifier_metadonnees(fichier_entree, fichier_sortie, titre, artiste, album) 
 
     # Sauvegarder les changements
     audio_file.save()
-    print("Métadonnées mises à jour avec succès !")
+    print("\nMétadonnées mises à jour avec succès !")
     
 if __name__ == "__main__" :
     fichier_entree = "VALD - TAL  TAL (clip officiel).mp3"
