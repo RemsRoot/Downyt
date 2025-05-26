@@ -36,7 +36,6 @@ def check_duplicate_trivial(items):
 ################# Fonction de vérification du fichier de téléchagement ##################
 def gestion_download_youtube() :
     list_files = os.listdir(path)
-    print(list_files)
     for files in list_files :
         if files == 'jaquette.jpg' :
             continue
@@ -65,7 +64,6 @@ def name_artiste_titre(artiste, titre) :
     for chaine in chaine_interdit_titre :
         titre = titre.replace(chaine, "")
     return artiste, titre
-          
 
 ################# Fonction pour afficher une nouvelle fenêtre ################
 def afficher_nouvelle_fenetre():
@@ -96,10 +94,6 @@ def afficher_nouvelle_fenetre():
         titre = yt.title
         # nom de la chaine
         auteur = yt.author
-        try :
-            album = yt.metadata['Album']
-        except :
-            album = ""
         # nom du fichier sauvegardé
         auteur, titre = name_artiste_titre(auteur, titre)
         path_movie = auteur + " - " + titre
@@ -238,7 +232,7 @@ def afficher_nouvelle_fenetre():
                 # Si c'est une musique, il faut changer les métadonnées
                 if audio_or_video != "v" :
                     file_name_final = str(downloads_path) + "\\" + auteur + " - " + titre.replace("/", "") + ".mp3"
-                    modifier_metadonnees(new_file, file_name_final, titre, auteur, album, file_name)
+                    modifier_metadonnees(new_file, file_name_final, titre, auteur, file_name)
                     if os.path.exists(new_file) :
                         os.remove(new_file)
             else :
@@ -246,7 +240,7 @@ def afficher_nouvelle_fenetre():
             if audio_or_video == "v" :
                 print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n")
             else : 
-                print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n", "Album  : ", album, "\n")   
+                print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n")   
         sub_bouton_telecharger = tk.Button(sub_window, text="Télécharger la vidéo", command=telecharger_video, width=70, height=3)
         sub_bouton_telecharger.grid(row=N+4, column=0, columnspan=2) # Affiche le bouton sur deux colonnes
         sub_bouton_telecharger.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))       
