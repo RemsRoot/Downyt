@@ -2,20 +2,19 @@ from pytubefix import YouTube
 from pytubefix.exceptions import VideoUnavailable, RegexMatchError
 import wget
 import os
-
 from math import ceil
-
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from matadata import modifier_metadonnees
+from metadata import modifier_metadonnees
 
 ################# Gestion fichier #################
 path = "download_youtube"
 
 if not os.path.exists(path) :
     os.mkdir(path)  
-    
+
+################# Fonction de gestion des doublons en paramètres youtube ###############
 def check_duplicate_trivial(items):
     list_ok = []
     for index_tot in range(len(items)) :
@@ -26,6 +25,35 @@ def check_duplicate_trivial(items):
         if ok == 0 :  
             list_ok.append(items[index_tot])
     return list_ok
+
+################# Fonction de vérification du fichier de téléchagement ##################
+def gestion_download_youtube() :
+    list_files = os.listdir(path)
+    for files in list_files :
+        if files.endswith(".mp4") :
+            continue
+        if files.endswith(".mp3") :
+            continue
+        if files.endswith(".m4a") :
+            try :
+                new_name = files[:-4] + ".mp3"
+                os.rename(path + "\\" + files, path + "\\" + new_name)
+                print(files + " -> " + new_name)
+            except Exception as e:
+                print("\nErreur app.py :", e)
+        else :
+            os.remove(path + files)
+      
+####################### Fonction de gestion des nom d'artiste et de titres
+def name_artiste_titre(artiste, titre) :
+    chaine_interdit_titre = [" (clip officiel)", artiste, " - ", "\\"]
+    chaine_interdit_artiste = [" - Topic", "\\", "/"]
+    for chaine in chaine_interdit_titre :
+        titre = titre.replace(chaine, "")
+    for chaine in chaine_interdit_artiste :
+        artiste = artiste.replace(chaine, "")
+    return artiste, titre
+          
 
 ################# Fonction pour afficher une nouvelle fenêtre ################
 def afficher_nouvelle_fenetre():
@@ -56,8 +84,15 @@ def afficher_nouvelle_fenetre():
         titre = yt.title
         # nom de la chaine
         auteur = yt.author
+        try :
+            album = yt.metadata['Album']
+        except :
+            album = ""
         # nom du fichier sauvegardé
+        auteur, titre = name_artiste_titre(auteur, titre)
         path_movie = auteur + " - " + titre
+        
+        
         # Téléchargement de l'image
         file_name = wget.download(yt.thumbnail_url, out="download_youtube\\") # télécharge la vignette       
         # Fichier MP4 avec son et audio séparés
@@ -168,8 +203,8 @@ def afficher_nouvelle_fenetre():
                 # télécharge la vidéo
                 if audio_or_video == "v" :
                     sub_label_param.config(text="EN COURS ...")
-                    if not os.path.exists(path) :
-                        stream.download(output_path= path)
+                    stream.download(output_path= path)
+
                 else :
                     sub_label_param.config(text="EN COURS ...")
                     out_file = stream.download(output_path= path)
@@ -188,38 +223,45 @@ def afficher_nouvelle_fenetre():
                     sub_label_param.config(text= f"Download Finish - {stream.filesize/(1024*1024):.2f} Mo")
                 else :
                     sub_label_param.config(text= f"Download Finish - {stream.filesize/(1024*1024):.2f} Go")
-                #option_select = 0
+                gestion_download_youtube()
+                # Si c'est une musique, il faut changer les métadonnées
+                if audio_or_video != "v" :
+                    file_name_final = path + "\\" + auteur + " - " + titre.replace("/", "") + ".mp3"
+                    modifier_metadonnees(new_file, file_name_final, titre, auteur, album)
             else :
                 sub_label_param.config(text="NO OPTION SELECT")
-            print("\n", auteur, "\n", titre, "\n")
+            if audio_or_video == "v" :
+                print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n")
+            else : 
+                print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n", "Album  : ", album, "\n")
                 
         sub_bouton_telecharger = tk.Button(sub_window, text="Télécharger la vidéo", command=telecharger_video, width=70, height=3)
         sub_bouton_telecharger.grid(row=N+4, column=0, columnspan=2) # Affiche le bouton sur deux colonnes
         sub_bouton_telecharger.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))         
         
+if __name__ == "__main__" :
+    ################ Crée la fenêtre principale ################
+    main_window = tk.Tk()
+    main_window.title("Youtube downloader")
+    main_window.geometry("700x400")
+    main_window.configure(bg="#333333", padx=10, pady=10)
 
-################ Crée la fenêtre principale ################
-main_window = tk.Tk()
-main_window.title("Youtube downloader")
-main_window.geometry("700x400")
-main_window.configure(bg="#333333", padx=10, pady=10)
+    ################# Ligne pour entrer du texte ################
+    main_entree = tk.Entry(main_window, width=200, relief=tk.RIDGE)
+    main_entree.pack(pady=10)
 
-################# Ligne pour entrer du texte ################
-main_entree = tk.Entry(main_window, width=200, relief=tk.RIDGE)
-main_entree.pack(pady=10)
+    ################# Bouton pour afficher une nouvelle fenêtre ################
+    main_button = tk.Button(main_window, text="Générer les options de la vidéo", command=afficher_nouvelle_fenetre, bg="blue", fg="white", font=("Helvetica", 12))
+    # Personnalise l'apparence du bouton
+    main_button.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))  # Ajoute un effet de relief au bouton
+    main_button.pack(pady=30)
 
-################# Bouton pour afficher une nouvelle fenêtre ################
-main_button = tk.Button(main_window, text="Générer les options de la vidéo", command=afficher_nouvelle_fenetre, bg="blue", fg="white", font=("Helvetica", 12))
-# Personnalise l'apparence du bouton
-main_button.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))  # Ajoute un effet de relief au bouton
-main_button.pack(pady=30)
+    ################# Label de vérification ################
+    main_label = tk.Label(main_window, relief=tk.SOLID, text="Vérifiation du lien", font=("Helvetica", 10), bg="#f05a2D", width=200, height=3)
+    main_label.pack()
 
-################# Label de vérification ################
-main_label = tk.Label(main_window, relief=tk.SOLID, text="Vérifiation du lien", font=("Helvetica", 10), bg="#f05a2D", width=200, height=3)
-main_label.pack()
-
-# Nombre de lignes dans la grille (modifiez cette valeur selon vos besoins)
-labels = []  # Pour stocker les labels afin de les mettre à jour
-        
-################# Lancement de la boucle principale de l'interface graphique ################
-main_window.mainloop()
+    # Nombre de lignes dans la grille (modifiez cette valeur selon vos besoins)
+    labels = []  # Pour stocker les labels afin de les mettre à jour
+            
+    ################# Lancement de la boucle principale de l'interface graphique ################
+    main_window.mainloop()

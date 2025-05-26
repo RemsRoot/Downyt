@@ -51,3 +51,5 @@ Remplacement de l'ancien package : pytube -> pytubefix
 ## Version 2.1
 
 Ajout des métadonnées automatiques
+
+1. Gestion de l'erreur lors d'un second téléchagement d'un même fichier qui génère un fichier ".m4a"
