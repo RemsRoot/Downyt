@@ -1,29 +1,13 @@
-# Youtube Downloader - Downyt
-
-Downyt est un outil qui permet de télécharger des vidéos youtube sous deux format ".mp4" (format vidéo) et ".mp3" (format musique). Il propose un interface avec deux pages :
-1 - Page pour entrer le lien
-2- Page qui permet de choisir les différents paramètres du fichier à télécharger
-
-## fichier 
-
-- download_youtube : répertoire de téléchargement des fichiers
-- iconbitmap.ico & logo.png: images pour l'interface des musiques
-- shell_youtube_downloader.bat : fichier shell script windows
-- app-V1.X.py : fichier du code python de l'application  
-
-# Package
-
-- pytube : package de gestion du lien youtube 
-- wget : package de gstion du téléchagement de la vidéo
-- os : package de gestion des commandes du systeme
-- tkinter : package de gestion de l'interface graphique
-- pillow (PIL) : package de gestion des images
-- math : pour la fonction ceil (arrondis entier supérieur)
+# Youtube Downloader - Downyt - Ancienne version
 
 # Lancement de l'app
 
 lancer la commande :
 ./shell_youtube_downloader.bat
+
+Il est possible de changer de version en déplacant le commantaire (les caractères "::") de lignes :
+- Pour lancer la version V1.1, il faut décommenter l'avant dernière ligne et commenter la dernière ligne.
+- Pour lancer la version V1.1, il faut commenter l'avant dernière ligne et décommenter la dernière ligne. [version de fichier par défaut]    
 
 # VERSION
 
