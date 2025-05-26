@@ -10,4 +10,5 @@ python -m pip install wget
 python -m pip install pillow
 
 :: lance le script main
+:: python .\app-V1.1.py
 python .\app-V1.2.py
