@@ -8,7 +8,6 @@ python -m pip install --upgrade pip
 python -m pip install pytubefix 
 python -m pip install wget
 python -m pip install pillow
-python -m pip install ffmpeg-python
 
 :: lance le script main
-python .\app-V2.1.py
+python .\app-V1.2.py
