@@ -166,8 +166,7 @@ def afficher_nouvelle_fenetre():
                 # télécharge la vidéo
                 if audio_or_video == "v" :
                     sub_label_param.config(text="EN COURS ...")
-                    if not os.path.exists(path) :
-                        stream.download(output_path= path)
+                    stream.download(output_path= path)
                 else :
                     sub_label_param.config(text="EN COURS ...")
                     out_file = stream.download(output_path= path)
