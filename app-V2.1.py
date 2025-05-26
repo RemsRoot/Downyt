@@ -18,6 +18,9 @@ if not os.path.exists(path) :
 # Récupère le chemin du dossier "Téléchargements" de l'utilisateur courant
 downloads_path = Path.home() / "Downloads"
 
+# Nom du fichier jaquette
+name_jaquette = path + '\\jaquette.jpg'
+
 ################# Fonction de gestion des doublons en paramètres youtube ###############
 def check_duplicate_trivial(items):
     list_ok = []
@@ -33,7 +36,10 @@ def check_duplicate_trivial(items):
 ################# Fonction de vérification du fichier de téléchagement ##################
 def gestion_download_youtube() :
     list_files = os.listdir(path)
+    print(list_files)
     for files in list_files :
+        if files == 'jaquette.jpg' :
+            continue
         if files.endswith(".mp4") :
             continue
         if files.endswith(".mp3") :
@@ -46,7 +52,7 @@ def gestion_download_youtube() :
             except Exception as e:
                 print("\nErreur app.py :", e)
         else :
-            os.remove(path + files)
+            os.remove(path + "\\" + files)
       
 ####################### Fonction de gestion des nom d'artiste et de titres ##########
 def name_artiste_titre(artiste, titre) :
@@ -100,7 +106,10 @@ def afficher_nouvelle_fenetre():
         
         
         # Téléchargement de l'image
-        file_name = wget.download(yt.thumbnail_url, out="download_youtube\\") # télécharge la vignette       
+    
+        if os.path.isfile(name_jaquette):
+            os.remove(name_jaquette)
+        file_name = wget.download(yt.thumbnail_url, out=name_jaquette) # télécharge la vignette       
         # Fichier MP4 avec son et audio séparés
         yt_video = yt.streams.filter(only_video=True, custom_filter_functions=[lambda video: (video.video_codec[0:3] == "avc")]) # trier par codec : avc
         nb_param_video = len(check_duplicate_trivial(yt_video.order_by("resolution")))
@@ -132,11 +141,6 @@ def afficher_nouvelle_fenetre():
         sub_label_image = tk.Label(sub_window, image=sub_photo)
         sub_label_image.photo = sub_photo
         sub_label_image.grid(row=0, column=0, columnspan=2)  # Affiche l'image sur deux colonnes
-        # Gestion de fichier #
-        if os.path.isfile(file_name):
-            os.remove(file_name)
-        else:
-            main_label.config(text= 'Path is not a file')
         # label qui affiche le titre de la vidéo
         sub_label_name = tk.Label(sub_window, relief=tk.SOLID, text=path_movie, font=("Helvetica", 10), bg="#f05a2D", width=80, height=3)
         sub_label_name.grid(row=1, column=0, columnspan=2)  
@@ -234,7 +238,7 @@ def afficher_nouvelle_fenetre():
                 # Si c'est une musique, il faut changer les métadonnées
                 if audio_or_video != "v" :
                     file_name_final = str(downloads_path) + "\\" + auteur + " - " + titre.replace("/", "") + ".mp3"
-                    modifier_metadonnees(new_file, file_name_final, titre, auteur, album)
+                    modifier_metadonnees(new_file, file_name_final, titre, auteur, album, file_name)
                     if os.path.exists(new_file) :
                         os.remove(new_file)
             else :
@@ -242,11 +246,10 @@ def afficher_nouvelle_fenetre():
             if audio_or_video == "v" :
                 print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n")
             else : 
-                print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n", "Album  : ", album, "\n")
-                
+                print("\n", "Auteur : ", auteur, "\n", "Titre  : ", titre, "\n", "Album  : ", album, "\n")   
         sub_bouton_telecharger = tk.Button(sub_window, text="Télécharger la vidéo", command=telecharger_video, width=70, height=3)
         sub_bouton_telecharger.grid(row=N+4, column=0, columnspan=2) # Affiche le bouton sur deux colonnes
-        sub_bouton_telecharger.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))         
+        sub_bouton_telecharger.config(relief=tk.RAISED, bg="#595959", fg= "white", highlightthickness= 0, font= ("Arial", 15, "bold"))       
         
 if __name__ == "__main__" :
     ################ Crée la fenêtre principale ################
