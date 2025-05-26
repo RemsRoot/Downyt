@@ -5,6 +5,7 @@ import os
 from math import ceil
 import tkinter as tk
 from PIL import Image, ImageTk
+from pathlib import Path
 
 from metadata import modifier_metadonnees
 
@@ -13,6 +14,9 @@ path = "download_youtube"
 
 if not os.path.exists(path) :
     os.mkdir(path)  
+
+# Récupère le chemin du dossier "Téléchargements" de l'utilisateur courant
+downloads_path = Path.home() / "Downloads"
 
 ################# Fonction de gestion des doublons en paramètres youtube ###############
 def check_duplicate_trivial(items):
@@ -227,8 +231,7 @@ def afficher_nouvelle_fenetre():
                 gestion_download_youtube()
                 # Si c'est une musique, il faut changer les métadonnées
                 if audio_or_video != "v" :
-                    file_name_final = path + "\\" + auteur + " - " + titre.replace("/", "") + ".mp3"
-                    print(new_file, "\n", file_name_final)
+                    file_name_final = str(downloads_path) + "\\" + auteur + " - " + titre.replace("/", "") + ".mp3"
                     modifier_metadonnees(new_file, file_name_final, titre, auteur, album)
                     if os.path.exists(new_file) :
                         os.remove(new_file)
