@@ -56,7 +56,7 @@ def gestion_download_youtube() :
 ####################### Fonction de gestion des nom d'artiste et de titres ##########
 def name_artiste_titre(artiste, titre) :
     # Suppression des caractères et chaine problématique ou récurante sur le l'artiste
-    chaine_interdit_artiste = [" - Topic", "\\", "/", " TV"]
+    chaine_interdit_artiste = [" - Topic", "\\", "/", " TV", "*"]
     for chaine in chaine_interdit_artiste :
         artiste = artiste.replace(chaine, "")
     # Suppression des caractères et chaine problématique ou récurante sur le titre
