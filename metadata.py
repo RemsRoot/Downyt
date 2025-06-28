@@ -44,6 +44,4 @@ def modifier_metadonnees(fichier_entree, fichier_sortie, titre, artiste, file_ja
     print("\nMétadonnées mises à jour avec succès !")
     
 if __name__ == "__main__" :
-    fichier_entree = "VALD - TAL  TAL (clip officiel).mp3"
-    fichier_sortie = "fichier_sortie.mp3"
-    modifier_metadonnees(fichier_entree, fichier_sortie, "titre", "artiste", "album")
+    prinf("OK")
